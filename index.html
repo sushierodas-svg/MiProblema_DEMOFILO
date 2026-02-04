@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eSCHOLARIS - Philosophy Review</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --verde-azulado: #183942;
+            --amarillo-dorado: #F5BE10;
+            --naranja-calido: #D96017;
+            --blanco: #FFFFFF;
+            --gris-claro: #F8F9FA;
+            --gris-texto: #555555;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--blanco);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--verde-azulado);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--naranja-calido);
+            background-color: var(--blanco);
+            color: var(--naranja-calido);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active {
+            background-color: var(--naranja-calido);
+            color: var(--blanco);
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 96, 23, 0.2);
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--verde-azulado);
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(24, 57, 66, 0.08);
+        }
+
+        .header-content h1 {
+            color: var(--amarillo-dorado);
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-content p {
+            color: var(--blanco);
+            font-size: 0.95em;
+            font-weight: 400;
+        }
+
+        .logo-escolaris {
+            color: var(--amarillo-dorado);
+            font-size: 3em;
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        .activity-section {
+            background-color: var(--gris-claro);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(24, 57, 66, 0.06);
+            margin-bottom: 30px;
+        }
+
+        .activity-title {
+            color: var(--verde-azulado);
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .activity-title span {
+            color: var(--naranja-calido);
+        }
+
+        .instructions {
+            background-color: var(--blanco);
+            padding: 20px;
+            border-left: 3px solid var(--naranja-calido);
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: var(--gris-texto);
+        }
+
+        .instructions p {
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            background-color: var(--naranja-calido);
+            color: var(--blanco);
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+        }
+
+        .section-label {
+            display: block;
+            font-weight: 600;
+            color: var(--verde-azulado);
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .section-description {
+            font-size: 0.9em;
+            color: var(--gris-texto);
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: var(--blanco);
+            border-left: 3px solid var(--amarillo-dorado);
+            border-radius: 4px;
+            font-weight: 400;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #DDD;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--blanco);
+            color: var(--verde-azulado);
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 120px;
+            font-weight: 400;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--naranja-calido);
+            box-shadow: 0 0 0 3px rgba(217, 96, 23, 0.1);
+            background-color: var(--blanco);
+        }
+
+        .text-input.short {
+            min-height: 80px;
+        }
+
+        .text-input.tall {
+            min-height: 200px;
+        }
+
+        /* Word Count */
+        .word-count {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+            font-weight: 400;
+        }
+
+        .word-count.warning {
+            color: var(--naranja-calido);
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary {
+            background-color: var(--naranja-calido);
+            color: var(--blanco);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 96, 23, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--verde-azulado);
+            color: var(--blanco);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(24, 57, 66, 0.2);
+        }
+
+        /* Messages */
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        .message.success {
+            background-color: #EBF5E0;
+            color: #3D6B3C;
+            border: 2px solid #7FBF7F;
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gris-texto);
+            font-size: 0.85em;
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .header-content h1 {
+                font-size: 1.5em;
+            }
+
+            .activity-section {
+                padding: 20px;
+            }
+
+            .activity-title {
+                font-size: 1.4em;
+            }
+
+            .language-selector {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-selector">
+        <button class="lang-btn active" onclick="changeLanguage('en')">EN</button>
+        <button class="lang-btn" onclick="changeLanguage('es')">ES</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1 id="header-title">TASK / REVIEW</h1>
+                <p id="header-subtitle">eSCHOLARIS</p>
+            </div>
+            <div class="logo-escolaris">🎨</div>
+        </div>
+
+        <div class="activity-section">
+            <h2 class="activity-title" id="activity-title">FUNDAMENTAL THEMES OF <span>PHILOSOPHY</span></h2>
+
+            <div class="instructions" id="instructions-box">
+                <p id="instruction-intro">In relation to the topics of the lesson, write a review following the steps below:</p>
+                <ol id="instructions-list">
+                    <li id="instruction-1">Choose a problem and explain the chosen problem. Enumerate the related sciences and define them.</li>
+                    <li id="instruction-2">Mention the philosophers who have studied the problem. Explain how the world in general visualizes the problem.</li>
+                    <li id="instruction-3">Comment and conclude.</li>
+                </ol>
+                <p id="instruction-note" style="margin-top: 15px; font-size: 0.95em;"><strong id="note-label">Note:</strong> <span id="note-text">You can only write in the text fields. Copy and paste is disabled.</span></p>
+            </div>
+
+            <!-- Section 1 -->
+            <div class="form-section">
+                <div class="section-title" id="section1-title">1. The Problem</div>
+                <label class="section-label" id="problem-label">Describe the philosophical problem you chose:</label>
+                <div class="section-description" id="problem-desc">
+                    Explain the problem clearly, enumerate the sciences related to it, and provide definitions for each science.
+                </div>
+                <textarea 
+                    class="text-input tall" 
+                    id="section1"
+                    placeholder="Write your response here..."
+                    onpaste="return false"
+                    oncopy="return false"
+                    oncut="return false"
+                    ondragstart="return false"
+                    ondrop="return false"
+                    onchange="updateWordCount('section1')"
+                    onkeyup="updateWordCount('section1')"
+                ></textarea>
+                <div class="word-count" id="section1-count">0 words</div>
+            </div>
+
+            <!-- Section 2 -->
+            <div class="form-section">
+                <div class="section-title" id="section2-title">2. Philosophers and Global Perspective</div>
+                <label class="section-label" id="philosophers-label">Mention philosophers and explain the world's perspective:</label>
+                <div class="section-description" id="philosophers-desc">
+                    List the philosophers who have studied this problem and explain how society in general understands or visualizes it.
+                </div>
+                <textarea 
+                    class="text-input tall" 
+                    id="section2"
+                    placeholder="Write your response here..."
+                    onpaste="return false"
+                    oncopy="return false"
+                    oncut="return false"
+                    ondragstart="return false"
+                    ondrop="return false"
+                    onchange="updateWordCount('section2')"
+                    onkeyup="updateWordCount('section2')"
+                ></textarea>
+                <div class="word-count" id="section2-count">0 words</div>
+            </div>
+
+            <!-- Section 3 -->
+            <div class="form-section">
+                <div class="section-title" id="section3-title">3. Comments and Conclusion</div>
+                <label class="section-label" id="conclusion-label">Provide your comments and conclusion:</label>
+                <div class="section-description" id="conclusion-desc">
+                    Share your personal thoughts on the problem and provide a clear conclusion about what you have learned.
+                </div>
+                <textarea 
+                    class="text-input tall" 
+                    id="section3"
+                    placeholder="Write your response here..."
+                    onpaste="return false"
+                    oncopy="return false"
+                    oncut="return false"
+                    ondragstart="return false"
+                    ondrop="return false"
+                    onchange="updateWordCount('section3')"
+                    onkeyup="updateWordCount('section3')"
+                ></textarea>
+                <div class="word-count" id="section3-count">0 words</div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="guardarActividad()" id="save-btn">Save Activity</button>
+                <button class="btn btn-primary" onclick="descargarPDF()" id="download-pdf-btn">Download PDF</button>
+                <button class="btn btn-secondary" onclick="limpiarActividad()" id="clear-btn">Clear</button>
+            </div>
+
+            <!-- Message -->
+            <div id="mensaje" class="message"></div>
+        </div>
+
+        <div class="footer">
+            <p id="footer-text">© 2026 eSCHOLARIS</p>
+        </div>
+    </div>
+
+    <script>
+        // Translations
+        const textos = {
+            en: {
+                'header-title': 'TASK / REVIEW',
+                'header-subtitle': 'eSCHOLARIS',
+                'activity-title': 'FUNDAMENTAL THEMES OF PHILOSOPHY',
+                'activity-title-span': 'PHILOSOPHY',
+                'instruction-intro': 'In relation to the topics of the lesson, write a review following the steps below:',
+                'instruction-1': 'Choose a problem and explain the chosen problem. Enumerate the related sciences and define them.',
+                'instruction-2': 'Mention the philosophers who have studied the problem. Explain how the world in general visualizes the problem.',
+                'instruction-3': 'Comment and conclude.',
+                'note-label': 'Note:',
+                'note-text': 'You can only write in the text fields. Copy and paste is disabled.',
+                'section1-title': '1. The Problem',
+                'problem-label': 'Describe the philosophical problem you chose:',
+                'problem-desc': 'Explain the problem clearly, enumerate the sciences related to it, and provide definitions for each science.',
+                'section2-title': '2. Philosophers and Global Perspective',
+                'philosophers-label': 'Mention philosophers and explain the world\'s perspective:',
+                'philosophers-desc': 'List the philosophers who have studied this problem and explain how society in general understands or visualizes it.',
+                'section3-title': '3. Comments and Conclusion',
+                'conclusion-label': 'Provide your comments and conclusion:',
+                'conclusion-desc': 'Share your personal thoughts on the problem and provide a clear conclusion about what you have learned.',
+                'save-btn': 'Save Activity',
+                'download-pdf-btn': 'Download PDF',
+                'clear-btn': 'Clear',
+                'save-success': 'Activity saved successfully!',
+                'download-success': 'PDF downloaded! You can share it with your teacher.',
+                'footer-text': '© 2026 eSCHOLARIS',
+                'word-format': '{0} words'
+            },
+            es: {
+                'header-title': 'TAREA / RESEÑA',
+                'header-subtitle': 'eSCHOLARIS',
+                'activity-title': 'TEMAS FUNDAMENTALES DE LA FILOSOFÍA',
+                'activity-title-span': 'FILOSOFÍA',
+                'instruction-intro': 'En relación con los temas de la lección, redacte una reseña siguiendo los pasos a continuación:',
+                'instruction-1': 'Elija un problema y explique el problema elegido. Enumere las ciencias relacionadas y defínalas.',
+                'instruction-2': 'Mencione a los filósofos que han estudiado el problema. Explique cómo el mundo en general visualiza el problema.',
+                'instruction-3': 'Comente y concluya.',
+                'note-label': 'Nota:',
+                'note-text': 'Solo puede escribir en los campos de texto. Copiar y pegar está deshabilitado.',
+                'section1-title': '1. El Problema',
+                'problem-label': 'Describa el problema filosófico que eligió:',
+                'problem-desc': 'Explique el problema claramente, enumere las ciencias relacionadas y proporcione definiciones para cada ciencia.',
+                'section2-title': '2. Filósofos y Perspectiva Global',
+                'philosophers-label': 'Mencione filósofos y explique la perspectiva del mundo:',
+                'philosophers-desc': 'Liste los filósofos que han estudiado este problema y explique cómo la sociedad en general lo entiende o visualiza.',
+                'section3-title': '3. Comentarios y Conclusión',
+                'conclusion-label': 'Proporcione sus comentarios y conclusión:',
+                'conclusion-desc': 'Comparta sus pensamientos personales sobre el problema y proporcione una conclusión clara sobre lo que ha aprendido.',
+                'save-btn': 'Guardar Actividad',
+                'download-pdf-btn': 'Descargar PDF',
+                'clear-btn': 'Limpiar',
+                'save-success': '¡Actividad guardada exitosamente!',
+                'download-success': '¡PDF descargado! Puedes compartirlo con tu maestra.',
+                'footer-text': '© 2026 eSCHOLARIS',
+                'word-format': '{0} palabras'
+            }
+        };
+
+        let idioma = 'en';
+
+        function changeLanguage(lang) {
+            idioma = lang;
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            actualizarTextos();
+        }
+
+        function actualizarTextos() {
+            const t = textos[idioma];
+
+            document.getElementById('header-title').textContent = t['header-title'];
+            document.getElementById('header-subtitle').textContent = t['header-subtitle'];
+            
+            const titleEl = document.getElementById('activity-title');
+            const titleSpan = (idioma === 'es' ? 'TEMAS FUNDAMENTALES DE LA ' : 'FUNDAMENTAL THEMES OF ');
+            titleEl.innerHTML = titleSpan + `<span>${t['activity-title-span']}</span>`;
+            
+            document.getElementById('instruction-intro').textContent = t['instruction-intro'];
+            document.getElementById('instruction-1').textContent = t['instruction-1'];
+            document.getElementById('instruction-2').textContent = t['instruction-2'];
+            document.getElementById('instruction-3').textContent = t['instruction-3'];
+            document.getElementById('note-label').textContent = t['note-label'];
+            document.getElementById('note-text').textContent = t['note-text'];
+
+            document.getElementById('section1-title').textContent = t['section1-title'];
+            document.getElementById('problem-label').textContent = t['problem-label'];
+            document.getElementById('problem-desc').textContent = t['problem-desc'];
+
+            document.getElementById('section2-title').textContent = t['section2-title'];
+            document.getElementById('philosophers-label').textContent = t['philosophers-label'];
+            document.getElementById('philosophers-desc').textContent = t['philosophers-desc'];
+
+            document.getElementById('section3-title').textContent = t['section3-title'];
+            document.getElementById('conclusion-label').textContent = t['conclusion-label'];
+            document.getElementById('conclusion-desc').textContent = t['conclusion-desc'];
+
+            document.getElementById('save-btn').textContent = t['save-btn'];
+            document.getElementById('download-pdf-btn').textContent = t['download-pdf-btn'];
+            document.getElementById('clear-btn').textContent = t['clear-btn'];
+            document.getElementById('footer-text').textContent = t['footer-text'];
+
+            // Update placeholders
+            document.getElementById('section1').placeholder = (idioma === 'es' ? 'Escribe tu respuesta aquí...' : 'Write your response here...');
+            document.getElementById('section2').placeholder = (idioma === 'es' ? 'Escribe tu respuesta aquí...' : 'Write your response here...');
+            document.getElementById('section3').placeholder = (idioma === 'es' ? 'Escribe tu respuesta aquí...' : 'Write your response here...');
+
+            // Update word counts
+            updateWordCount('section1');
+            updateWordCount('section2');
+            updateWordCount('section3');
+        }
+
+        function updateWordCount(fieldId) {
+            const textarea = document.getElementById(fieldId);
+            const text = textarea.value.trim();
+            const words = text === '' ? 0 : text.split(/\s+/).length;
+            const countEl = document.getElementById(fieldId + '-count');
+            
+            if (idioma === 'es') {
+                countEl.textContent = words + ' palabras';
+            } else {
+                countEl.textContent = words + ' words';
+            }
+        }
+
+        function guardarActividad() {
+            const datos = {
+                section1: document.getElementById('section1').value,
+                section2: document.getElementById('section2').value,
+                section3: document.getElementById('section3').value
+            };
+
+            localStorage.setItem('resena_filosofia', JSON.stringify(datos));
+
+            const mensaje = document.getElementById('mensaje');
+            mensaje.textContent = textos[idioma]['save-success'];
+            mensaje.className = 'message success';
+
+            setTimeout(() => {
+                mensaje.className = 'message';
+            }, 3000);
+        }
+
+        function descargarPDF() {
+            const datos = {
+                section1: document.getElementById('section1').value,
+                section2: document.getElementById('section2').value,
+                section3: document.getElementById('section3').value
+            };
+
+            const tempDiv = document.createElement('div');
+            tempDiv.style.width = '800px';
+            tempDiv.style.padding = '20px';
+            tempDiv.style.backgroundColor = 'white';
+            tempDiv.style.fontFamily = 'Inter, Arial, sans-serif';
+            tempDiv.style.color = '#183942';
+            tempDiv.style.lineHeight = '1.8';
+
+            const lang = idioma;
+            const labels = {
+                en: {
+                    title: 'PHILOSOPHICAL REVIEW',
+                    subtitle: 'Fundamental Themes of Philosophy',
+                    section1: '1. The Problem',
+                    section2: '2. Philosophers and Global Perspective',
+                    section3: '3. Comments and Conclusion',
+                    date: 'Date'
+                },
+                es: {
+                    title: 'RESEÑA FILOSÓFICA',
+                    subtitle: 'Temas Fundamentales de la Filosofía',
+                    section1: '1. El Problema',
+                    section2: '2. Filósofos y Perspectiva Global',
+                    section3: '3. Comentarios y Conclusión',
+                    date: 'Fecha'
+                }
+            };
+
+            const lbl = labels[lang];
+
+            let html = `
+                <div style="border-bottom: 3px solid #D96017; margin-bottom: 30px; padding-bottom: 20px;">
+                    <div style="font-size: 24px; font-weight: 700; color: #D96017; margin-bottom: 10px;">🎨 eSCHOLARIS</div>
+                    <h1 style="color: #183942; font-size: 28px; margin: 0; font-weight: 700;">${lbl.title}</h1>
+                    <div style="color: #F5BE10; font-size: 18px; margin-top: 5px; font-weight: 600;">${lbl.subtitle}</div>
+                </div>
+
+                <div style="background-color: #F8F9FA; border-left: 3px solid #D96017; padding: 20px; margin: 30px 0; border-radius: 6px;">
+                    <h2 style="color: #D96017; font-size: 18px; margin-bottom: 15px; font-weight: 700;">${lbl.section1}</h2>
+                    <div style="font-size: 14px; color: #183942; padding: 10px; background-color: white; border-radius: 4px; white-space: pre-wrap; font-weight: 400;">
+                        ${escapeHtml(datos.section1) || '<em>Not completed</em>'}
+                    </div>
+                </div>
+
+                <div style="background-color: #F8F9FA; border-left: 3px solid #D96017; padding: 20px; margin: 30px 0; border-radius: 6px;">
+                    <h2 style="color: #D96017; font-size: 18px; margin-bottom: 15px; font-weight: 700;">${lbl.section2}</h2>
+                    <div style="font-size: 14px; color: #183942; padding: 10px; background-color: white; border-radius: 4px; white-space: pre-wrap; font-weight: 400;">
+                        ${escapeHtml(datos.section2) || '<em>Not completed</em>'}
+                    </div>
+                </div>
+
+                <div style="background-color: #F8F9FA; border-left: 3px solid #D96017; padding: 20px; margin: 30px 0; border-radius: 6px;">
+                    <h2 style="color: #D96017; font-size: 18px; margin-bottom: 15px; font-weight: 700;">${lbl.section3}</h2>
+                    <div style="font-size: 14px; color: #183942; padding: 10px; background-color: white; border-radius: 4px; white-space: pre-wrap; font-weight: 400;">
+                        ${escapeHtml(datos.section3) || '<em>Not completed</em>'}
+                    </div>
+                </div>
+
+                <div style="text-align: right; font-size: 11px; color: #999; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;">
+                    ${lbl.date}: ${new Date().toLocaleString(idioma === 'es' ? 'es-ES' : 'en-US')}
+                </div>
+
+                <div style="text-align: center; font-size: 12px; color: #D96017; margin-top: 30px; font-weight: 700;">
+                    eSCHOLARIS
+                </div>
+            `;
+
+            tempDiv.innerHTML = html;
+            document.body.appendChild(tempDiv);
+
+            html2canvas(tempDiv, {
+                scale: 2,
+                logging: false,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'letter'
+                });
+
+                const imgWidth = 203;
+                const pageHeight = 250;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                pdf.addImage(imgData, 'PNG', 3.5, position + 10, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 3.5, position + 10, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                const filename = idioma === 'es' ? 'Reseña_Filosofía' : 'Philosophy_Review';
+                pdf.save(`${filename}_${new Date().getTime()}.pdf`);
+                document.body.removeChild(tempDiv);
+
+                const mensaje = document.getElementById('mensaje');
+                mensaje.textContent = textos[idioma]['download-success'];
+                mensaje.className = 'message success';
+
+                setTimeout(() => {
+                    mensaje.className = 'message';
+                }, 3000);
+            }).catch(err => {
+                console.error('Error:', err);
+                document.body.removeChild(tempDiv);
+            });
+        }
+
+        function limpiarActividad() {
+            const confirmMsg = idioma === 'es' ? '¿Estás seguro de que deseas limpiar todos los campos?' : 'Are you sure you want to clear all fields?';
+            if (confirm(confirmMsg)) {
+                document.getElementById('section1').value = '';
+                document.getElementById('section2').value = '';
+                document.getElementById('section3').value = '';
+                localStorage.removeItem('resena_filosofia');
+                updateWordCount('section1');
+                updateWordCount('section2');
+                updateWordCount('section3');
+            }
+        }
+
+        window.addEventListener('load', function() {
+            const datosGuardados = localStorage.getItem('resena_filosofia');
+            if (datosGuardados) {
+                const datos = JSON.parse(datosGuardados);
+                document.getElementById('section1').value = datos.section1;
+                document.getElementById('section2').value = datos.section2;
+                document.getElementById('section3').value = datos.section3;
+            }
+            actualizarTextos();
+        });
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            return false;
+        });
+    </script>
+</body>
+</html>
